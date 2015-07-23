@@ -1,4 +1,4 @@
-# express-graceful-shutdown
+# express-graceful-shutdown-handler
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
@@ -10,13 +10,13 @@ After encountering an exception this middleware stops accepting new requests, wa
 ## Installation
 
 ```bash
-$ npm install express-graceful-shutdown
+$ npm install express-graceful-shutdown-handler
 ```
 
 ## API
 
 ```js
-var gracefulShutdown = require('express-graceful-shutdown')
+var gracefulShutdown = require('express-graceful-shutdown-handler')
 
 ```
 
@@ -49,11 +49,11 @@ The default value is `503`.
 
 ## Example
 
-A simple example using `express-graceful-shutdown` to log the exception asynchronously (for example to Slack), witing for the logger to complete the request.
+A simple example using `express-graceful-shutdown-handler` to log the exception asynchronously (for example to Slack), witing for the logger to complete the request.
 
 ```js
 var express = require('express')
-var gracefulShutdown = require('express-graceful-shutdown')
+var gracefulShutdown = require('express-graceful-shutdown-handler')
 
 var app = express()
 
@@ -89,7 +89,7 @@ Every consecutive request will return with HTTP status code `503`.
 
 [MIT](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/express-graceful-shutdown.svg
-[npm-url]: https://npmjs.org/package/express-graceful-shutdown
-[downloads-image]: https://img.shields.io/npm/dm/express-graceful-shutdown.svg
-[downloads-url]: https://npmjs.org/package/express-graceful-shutdown
+[npm-image]: https://img.shields.io/npm/v/express-graceful-shutdown-handler.svg
+[npm-url]: https://npmjs.org/package/express-graceful-shutdown-handler
+[downloads-image]: https://img.shields.io/npm/dm/express-graceful-shutdown-handler.svg
+[downloads-url]: https://npmjs.org/package/express-graceful-shutdown-handler

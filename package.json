@@ -1,0 +1,31 @@
+{
+  "name": "express-graceful-shutdown-handler",
+  "version": "1.0.0",
+  "description": "Middleware to handle graceful shutdown on any uncaught exception.",
+  "main": "./lib/index",
+  "scripts": {
+    "prepublish": "coffee -o lib/ src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SwingDev/express-graceful-shutdown-handler.git"
+  },
+  "keywords": [
+    "expressjs",
+    "express",
+    "exception",
+    "shutdown",
+    "graceful"
+  ],
+  "author": "Tomek Kopczuk <tkopczuk@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SwingDev/express-graceful-shutdown-handler/issues"
+  },
+  "homepage": "https://github.com/SwingDev/express-graceful-shutdown-handler#readme",
+  "dependencies": {
+    "lodash": "^3.10.0",
+    "on-finished": "^2.3.0"
+  }
+}
