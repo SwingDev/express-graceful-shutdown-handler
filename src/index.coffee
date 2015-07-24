@@ -86,8 +86,6 @@ class ExpressGracefulShutdown
 
   # Actions
   applyKillConditions: () ->
-    console.log "queue <#{@pendingRequestsCount}, #{@pendingExceptionsCount}>"
-
     return if not @gracefulShutdownMode
     return if @pendingRequestsCount   > 0
     return if @pendingExceptionsCount > 0
