@@ -24,7 +24,7 @@ class ExpressGracefulShutdown
   # Middleware
   middleware: () =>
     (req, res, next) =>
-      domain = @bindToDomain req, res
+      domain = @bindReqResToDomain req, res
 
       @pendingRequestsCount += 1
       onFinished res, @requestFinishHandler
@@ -33,7 +33,6 @@ class ExpressGracefulShutdown
         return res.sendStatus @inShutdownRespondWithStatus
 
       @runCallbackInDomain domain, next
-      domain.run -> next()
 
   # Domains
   bindReqResToDomain: (req, res) ->
@@ -56,7 +55,7 @@ class ExpressGracefulShutdown
   # Event Handlers
   exceptionHandler: (res) ->
     (exc) =>
-      if res
+      if res and not res.headersSent
         # onFinished handler will fire
         res.sendStatus 500
       else
