@@ -20,7 +20,7 @@ var gracefulShutdown = require('express-graceful-shutdown-handler')
 
 ```
 
-**Note** Requiring the module adds a listener for `uncaughtException`.
+**Note** Requiring the module adds a `uncaughtException` listener.
 
 
 ### gracefulShutdown(options)
@@ -28,6 +28,18 @@ var gracefulShutdown = require('express-graceful-shutdown-handler')
 Creates a graceful shutdown middleware with the given `options`.
 
 **Note** Make sure it's attached as the first middleware.
+
+##### domainEnabled
+
+Create a new domain and bind request and response to it. This enables the library to return 500 error on the request that caused an unhandled exception to happen, instead of severing the connection.
+
+The default value is `true`.
+
+##### domainIdFunc
+
+If `domainEnabled` is set to true, you can look at `process.domain.id` in your `onExceptionFn` to see the unique request id. This function is given `req` and is expected to return this id.
+
+The default behavior is to return an incremented number for each request.
 
 ##### onExceptionFn
 
@@ -49,7 +61,7 @@ The default value is `503`.
 
 ## Example
 
-A simple example using `express-graceful-shutdown-handler` to log the exception asynchronously (for example to Slack), witing for the logger to complete the request.
+A simple example using `express-graceful-shutdown-handler` to log the exception asynchronously (for example to Slack), waiting for the logger to complete the request.
 
 ```js
 var express = require('express')

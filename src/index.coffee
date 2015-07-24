@@ -1,9 +1,14 @@
-_          = require 'lodash'
-onFinished = require 'on-finished'
+createDomain = require('domain').create
+
+_            = require 'lodash'
+onFinished   = require 'on-finished'
 
 class ExpressGracefulShutdown
   constructor: (options) ->
     # Parse options
+    @domainEnabled               = options.domainEnabled
+    @domainIdFunc                = options.domainIdFunc
+
     @onExceptionFn               = options.onExceptionFn
     @shutdownGraceSeconds        = options.shutdownGraceSeconds
     @inShutdownRespondWithStatus = options.inShutdownRespondWithStatus
@@ -14,32 +19,58 @@ class ExpressGracefulShutdown
     @pendingExceptionsCount = 0
 
     # Setup
-    process.on 'uncaughtException', @exceptionHandler
+    process.on 'uncaughtException', @exceptionHandler()
 
   # Middleware
   middleware: () =>
     (req, res, next) =>
+      domain = @bindToDomain req, res
+
       @pendingRequestsCount += 1
       onFinished res, @requestFinishHandler
 
       if @gracefulShutdownMode
         return res.sendStatus @inShutdownRespondWithStatus
 
-      next()
+      @runCallbackInDomain domain, next
+      domain.run -> next()
+
+  # Domains
+  bindReqResToDomain: (req, res) ->
+    return unless @domainEnabled
+
+    domain = createDomain()
+    domain.id = @domainIdFunc req
+
+    domain.add(req)
+    domain.add(res)
+    domain.on 'error', @exceptionHandler(res)
+
+    domain
+
+  runCallbackInDomain: (domain, callback) ->
+    return callback() unless domain?
+
+    domain.run -> callback()
 
   # Event Handlers
-  exceptionHandler: (exc) =>
-    # Correct for current request, which threw the exception.
-    @pendingRequestsCount   -= 1
+  exceptionHandler: (res) ->
+    (exc) =>
+      if res
+        # onFinished handler will fire
+        res.sendStatus 500
+      else
+        # Correct for domain runaway request.
+        @pendingRequestsCount  -= 1
 
-    # Go into shutdown mode.
-    @gracefulShutdownMode = true
-    @startHardKillTimer()
+      # Go into shutdown mode.
+      @gracefulShutdownMode = true
+      @startHardKillTimer()
 
-    @pendingExceptionsCount += 1
-    @onExceptionFn exc, () =>
-      @pendingExceptionsCount -= 1
-      @applyKillConditions()
+      @pendingExceptionsCount += 1
+      @onExceptionFn exc, () =>
+        @pendingExceptionsCount -= 1
+        @applyKillConditions()
 
   requestFinishHandler: () =>
     @pendingRequestsCount -= 1
@@ -67,8 +98,12 @@ class ExpressGracefulShutdown
     process.exit(1)
 
 
+reqId = 0
 module.exports = (options) ->
   defaultOptions = {
+    domainEnabled: true
+    domainIdFunc: (req) -> return reqId++
+
     onExceptionFn: (exc, callback) ->
       console.error exc
       callback()
